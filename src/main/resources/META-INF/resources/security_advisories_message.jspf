@@ -1,0 +1,66 @@
+<%--
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+--%>
+
+<c:if test="<%= securityAdvisoriesHelper != null %>">
+
+	<%
+	int securityAdvisoriesNewFixpack = securityAdvisoriesHelper.getLatestJiraFixpack();
+
+	List<SecurityAdvisoriesHelper.Issue> issues = null;
+	String securityAdvisoriesLevel = null;
+
+	if (ListUtil.isNotEmpty(securityAdvisoriesHelper.getSev1Issues())) {
+		issues = securityAdvisoriesHelper.getSev1Issues();
+		securityAdvisoriesLevel = "SEV-1";
+	}
+	else if (ListUtil.isNotEmpty(securityAdvisoriesHelper.getSev2Issues())) {
+		issues = securityAdvisoriesHelper.getSev2Issues();
+		securityAdvisoriesLevel = "SEV-2";
+	}
+	else if (ListUtil.isNotEmpty(securityAdvisoriesHelper.getSev3Issues())) {
+		issues = securityAdvisoriesHelper.getSev3Issues();
+		securityAdvisoriesLevel = "SEV-3";
+	}
+	%>
+
+	<c:if test="<%= issues != null %>">
+
+		<%
+		String securityAdvisoriesIssues = "";
+
+		for (SecurityAdvisoriesHelper.Issue issue : issues) {
+			if (securityAdvisoriesIssues.length() > 0) {
+				securityAdvisoriesIssues += ", ";
+			}
+
+			securityAdvisoriesIssues = securityAdvisoriesIssues + "<a href='https://issues.liferay.com/browse/" + issue.getKey() + "' style='color: #0B5FFF;'>" + issue.getKey() + "</a>";
+		}
+
+		for (SecurityAdvisoriesHelper.Issue issue : issues) {
+			if (issue.getFixpack() > securityAdvisoriesNewFixpack) {
+				securityAdvisoriesNewFixpack = issue.getFixpack();
+			}
+		}
+		%>
+
+		<liferay-ui:message arguments="<%= new String[] {securityAdvisoriesLevel, securityAdvisoriesIssues} %>" key="security-vulnerabilities-not-fixed-x-x" /><br />
+		<liferay-ui:message arguments="<%= securityAdvisoriesNewFixpack %>" key="security-vulnerabilities-update-to-fixpack-x" />
+	</c:if>
+
+	<c:if test="<%= (issues == null) && (securityAdvisoriesNewFixpack > 0) %>">
+		<liferay-ui:message arguments="<%= securityAdvisoriesNewFixpack %>" key="new-fixpack-available-x" />
+	</c:if>
+</c:if>
