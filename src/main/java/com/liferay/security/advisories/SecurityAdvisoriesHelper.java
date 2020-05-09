@@ -114,8 +114,8 @@ public class SecurityAdvisoriesHelper {
 		);
 
 		String query = StringBundler.concat(
-			"project = LPS AND status = Closed AND resolution = Fixed AND ",
-			"fixVersion = \"", version, ".X\" AND \"", version,
+			"project = LPS AND status = Closed AND resolution in (Completed, ",
+			"Fixed) AND fixVersion = \"", version, ".X\" AND \"", version,
 			" Fix Pack Version\" > ", String.valueOf(fixpack),
 			" AND updated < -1d ORDER BY \"", version,
 			" Fix Pack Version\" DESC");
@@ -403,8 +403,8 @@ public class SecurityAdvisoriesHelper {
 		);
 
 		String query = StringBundler.concat(
-			"project = LPE AND status = Closed AND resolution = Fixed AND ",
-			"labels = lsv AND fixVersion = \"", version,
+			"project = LPE AND status = Closed AND labels = lsv AND ",
+			"resolution in (Completed, Fixed) AND fixVersion = \"", version,
 			".X EE\" AND labels = sev-", String.valueOf(severity),
 			" ORDER BY \"", version, " Fix Pack Version\" DESC");
 
