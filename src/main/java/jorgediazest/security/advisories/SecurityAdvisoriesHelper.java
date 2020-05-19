@@ -527,6 +527,10 @@ public class SecurityAdvisoriesHelper {
 			"content.Language", LocaleUtil.getDefault(),
 			SecurityAdvisoriesHelper.class);
 
+		if (_log.isWarnEnabled()) {
+			_log.warn(language.get(resourceBundle, "disclaimer"));
+		}
+
 		if (!sev1Issues.isEmpty()) {
 			_log.error(
 				language.format(
