@@ -1,4 +1,17 @@
-# Security Advisories for Liferay DXP
+# Security Advisories for Liferay DXP (unofficial)
+
+## Disclaimer
+
+**Disclaimer**: This application is not officially supported by Liferay, Inc. or its affiliates.
+
+In case you have any question about any Liferay security vulnerability, you should always check the official Liferay Security Advisories:
+
+  - Liferay DXP (enterprise): https://help.liferay.com/hc/en-us/articles/360018875952-Security-Advisories
+  - Liferay Portal (community): https://portal.liferay.dev/learn/security/known-vulnerabilities/-/asset_publisher/HbL5mxmVrnXW
+
+I am providing this tool to make easier to notice if your system is out-of-date but <ins>you should always subscribe and review the official Liferay vulnerability notifications</ins>
+
+## Introduction
 
 Security Advisories application displays the security vulnerabilities that are not fixed in your Liferay DXP installation.
 
@@ -13,7 +26,7 @@ Security Advisories works in:
   - Liferay DXP 7.0
   - Liferay DXP 7.1
   - Liferay DXP 7.2
- 
+
 Liferay Portal (community edition) is not supported for now.
 
 ## Installation
@@ -60,7 +73,7 @@ If your server has a minor vulnerability not fixed (SEV-3 level) a warning messa
   - Server administration page
 
 ![](images/warn_server-admin.png)
- 
+
 ### Information message: There aren't vulnerabilities, but there is a newer fixpack available :information_source:
 
 If there aren't any vulnerabilities to fix, but there is a newer fixpack available, an information  message will be displayed:
@@ -81,4 +94,3 @@ If there aren't any vulnerabilities to fix, but there is a newer fixpack availab
 If your server is up-to-date nothing will be displayed anywhere, you don't have to install any fixpacks.
 
 Relax and wait until next vulnerability is fixed and published in a new fixpack :relaxed:
-
