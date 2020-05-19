@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.security.advisories.constants;
+package jorgediazest.security.advisories.constants;
 
 /**
  * @author Jorge Díaz

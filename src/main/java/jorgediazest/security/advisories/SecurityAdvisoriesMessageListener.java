@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.security.advisories;
+package jorgediazest.security.advisories;
 
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;

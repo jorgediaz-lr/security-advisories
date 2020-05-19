@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.security.advisories;
+package jorgediazest.security.advisories;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.taglib;
+package jorgediazest.taglib;
 
 import com.liferay.portal.kernel.servlet.taglib.TagDynamicIdFactory;
 import com.liferay.portal.kernel.util.Portal;

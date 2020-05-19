@@ -23,11 +23,12 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ListUtil" %><%@
-page import="com.liferay.portal.kernel.util.Validator" %><%@
-page import="com.liferay.security.advisories.SecurityAdvisoriesHelper" %><%@
-page import="com.liferay.security.advisories.constants.SecurityAdvisoriesWebKeys" %>
+page import="com.liferay.portal.kernel.util.Validator" %>
 
 <%@ page import="java.util.List" %>
+
+<%@ page import="jorgediazest.security.advisories.SecurityAdvisoriesHelper" %><%@
+page import="jorgediazest.security.advisories.constants.SecurityAdvisoriesWebKeys" %>
 
 <liferay-frontend:defineObjects />
 

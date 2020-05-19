@@ -31,7 +31,7 @@ Liferay Portal (community edition) is not supported for now.
 
 ## Installation
 
-Download it from https://github.com/jorgediaz-lr/security-advisories/releases/download/v1.0.0/com.liferay.security.advisories.jar and copy it to Liferay DXP deploy folder.
+Download it from https://github.com/jorgediaz-lr/security-advisories/releases/download/v1.0.0/jorgediazest.security.advisories.jar and copy it to Liferay DXP deploy folder.
 
 Your server must have access to the JIRA server https://issues.liferay.com in order to be able to download the information of solved security issues and fixpacks from there. (Note: As solved LPE bug information is open, a JIRA user account is not needed)
 

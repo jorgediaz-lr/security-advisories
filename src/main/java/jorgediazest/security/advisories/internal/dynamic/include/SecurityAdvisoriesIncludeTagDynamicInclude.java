@@ -12,14 +12,12 @@
  * details.
  */
 
-package com.liferay.security.advisories.internal.dynamic.include;
+package jorgediazest.security.advisories.internal.dynamic.include;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.taglib.TagDynamicInclude;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.security.advisories.SecurityAdvisoriesHelper;
-import com.liferay.security.advisories.constants.SecurityAdvisoriesWebKeys;
 
 import java.io.IOException;
 
@@ -28,6 +26,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import jorgediazest.security.advisories.SecurityAdvisoriesHelper;
+import jorgediazest.security.advisories.constants.SecurityAdvisoriesWebKeys;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -77,7 +78,7 @@ public class SecurityAdvisoriesIncludeTagDynamicInclude
 	}
 
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.security.advisories)",
+		target = "(osgi.web.symbolicname=jorgediazest.security.advisories)",
 		unbind = "-"
 	)
 	protected void setServletContext(ServletContext servletContext) {
