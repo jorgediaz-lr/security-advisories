@@ -11,6 +11,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id "idea"
+}
+
 apply plugin: "com.liferay.plugin"
 apply plugin: "com.liferay.target.platform"
 

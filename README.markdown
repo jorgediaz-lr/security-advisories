@@ -29,6 +29,10 @@ Security Advisories works in:
 
 Liferay Portal (community edition) is not supported for now.
 
+## Contributing
+
+If you want to contribute to this project, read [CONTRIBUTING.markdown](CONTRIBUTING.markdown) before sending a pull request.
+
 ## Installation
 
 Download it from https://github.com/jorgediaz-lr/security-advisories/releases/download/v1.0.0/jorgediazest.security.advisories.jar and copy it to Liferay DXP deploy folder.
