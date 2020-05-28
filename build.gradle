@@ -19,6 +19,8 @@ apply plugin: "com.liferay.plugin"
 apply plugin: "com.liferay.target.platform"
 
 dependencies {
+	compileOnly group: "com.liferay", name: "biz.aQute.bnd.annotation", version: "4.2.0.LIFERAY-PATCHED-1" /* from 7.0 to 7.2 => compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib"*/
+	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0" /* from 7.1 to 7.3 => compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api"*/
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
 	compileOnly group: "javax.portlet", name: "portlet-api"
 	compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
@@ -26,7 +28,7 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
 }
 
-dependencies {
+dependencies{
 	targetPlatformBoms group: "com.liferay.portal", name: "release.portal.bom", version: "7.0.6"
 	targetPlatformBoms group: "com.liferay.portal", name: "release.portal.bom.compile.only", version: "7.0.6"
 }
