@@ -20,7 +20,11 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.patcher.PatcherUtil;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -30,6 +34,8 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -43,6 +49,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
 
 import jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration;
 
@@ -173,6 +181,43 @@ public class SecurityAdvisoriesHelper {
 		return sev3Issues;
 	}
 
+	public boolean hasSecurityAdvisoriesRole(
+		HttpServletRequest httpServletRequest) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return hasSecurityAdvisoriesRole(themeDisplay.getPermissionChecker());
+	}
+
+	public boolean hasSecurityAdvisoriesRole(
+		PermissionChecker permissionChecker) {
+
+		if (_roles.length == 0) {
+			return permissionChecker.isOmniadmin();
+		}
+
+		User user = permissionChecker.getUser();
+
+		for (String role : _roles) {
+			try {
+				if (roleLocalService.hasUserRole(
+						user.getUserId(), user.getCompanyId(), role, true)) {
+
+					return true;
+				}
+			}
+			catch (PortalException e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(e);
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public class Issue {
 
 		public static final String JQL_FIELDS = "labels,summary,components";
@@ -280,6 +325,8 @@ public class SecurityAdvisoriesHelper {
 	protected void activate(Map<String, Object> properties) {
 		_securityAdvisoriesConfiguration = ConfigurableUtil.createConfigurable(
 			SecurityAdvisoriesConfiguration.class, properties);
+
+		initRoles();
 
 		reset();
 
@@ -405,6 +452,26 @@ public class SecurityAdvisoriesHelper {
 		);
 	}
 
+	protected String[] getIssuesToIgnore() {
+		String configuration =
+			_securityAdvisoriesConfiguration.issuesToIgnore();
+
+		if (Validator.isNull(configuration)) {
+			return null;
+		}
+
+		String[] issuesToIgnore = configuration.split(",|\\s");
+
+		issuesToIgnore = ArrayUtil.filter(
+			issuesToIgnore, r -> Validator.isNotNull(r));
+
+		if (issuesToIgnore.length == 0) {
+			return null;
+		}
+
+		return issuesToIgnore;
+	}
+
 	protected List<Issue> getJiraSecurityIssues(int buildNumber, int severity)
 		throws IOException, PortalException {
 
@@ -505,16 +572,10 @@ public class SecurityAdvisoriesHelper {
 		try {
 			String[] fixedIssues = PatcherUtil.getFixedIssues();
 
-			String issuesToIgnore =
-				_securityAdvisoriesConfiguration.issuesToIgnore();
+			String[] issuesToIgnore = getIssuesToIgnore();
 
-			if ((issuesToIgnore != null) && (issuesToIgnore.length() > 0)) {
-				String[] issuesToIgnoreArray = issuesToIgnore.split(",");
-
-				if (issuesToIgnoreArray.length > 0) {
-					fixedIssues = ArrayUtil.append(
-						fixedIssues, issuesToIgnoreArray);
-				}
+			if (issuesToIgnore != null) {
+				fixedIssues = ArrayUtil.append(fixedIssues, issuesToIgnore);
 			}
 
 			latestJiraFixpack = getLatestJiraFixpack(
@@ -548,6 +609,12 @@ public class SecurityAdvisoriesHelper {
 
 			reset();
 		}
+	}
+
+	protected void initRoles() {
+		String[] roles = _securityAdvisoriesConfiguration.roles();
+
+		_roles = ArrayUtil.filter(roles, r -> Validator.isNotNull(r));
 	}
 
 	protected void reset() {
@@ -649,6 +716,10 @@ public class SecurityAdvisoriesHelper {
 	protected Language language;
 
 	protected int latestJiraFixpack;
+
+	@Reference
+	protected RoleLocalService roleLocalService;
+
 	protected List<Issue> sev1Issues;
 	protected List<Issue> sev2Issues;
 	protected List<Issue> sev3Issues;
@@ -682,6 +753,7 @@ public class SecurityAdvisoriesHelper {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SecurityAdvisoriesHelper.class);
 
+	private String[] _roles;
 	private volatile SecurityAdvisoriesConfiguration
 		_securityAdvisoriesConfiguration;
 

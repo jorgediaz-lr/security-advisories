@@ -16,12 +16,9 @@ package jorgediazest.security.advisories.internal.dynamic.include;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -59,17 +56,6 @@ public class SecurityAdvisoriesBottomJSPDynamicInclude
 			return;
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		PermissionChecker permissionChecker =
-			themeDisplay.getPermissionChecker();
-
-		if (!permissionChecker.isOmniadmin()) {
-			return;
-		}
-
 		HttpSession httpSession = httpServletRequest.getSession();
 
 		if (GetterUtil.getBoolean(
@@ -85,6 +71,12 @@ public class SecurityAdvisoriesBottomJSPDynamicInclude
 		httpServletRequest.setAttribute(
 			SecurityAdvisoriesWebKeys.SECURITY_ADVISORY_HELPER,
 			securityAdvisoriesHelper);
+
+		if (!securityAdvisoriesHelper.hasSecurityAdvisoriesRole(
+				httpServletRequest)) {
+
+			return;
+		}
 
 		super.include(httpServletRequest, httpServletResponse, key);
 	}

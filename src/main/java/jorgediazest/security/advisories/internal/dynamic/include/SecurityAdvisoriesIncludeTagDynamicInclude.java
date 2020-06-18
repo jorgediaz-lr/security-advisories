@@ -55,6 +55,12 @@ public class SecurityAdvisoriesIncludeTagDynamicInclude
 			return;
 		}
 
+		if (!securityAdvisoriesHelper.hasSecurityAdvisoriesRole(
+				httpServletRequest)) {
+
+			return;
+		}
+
 		httpServletRequest.setAttribute(
 			SecurityAdvisoriesWebKeys.SECURITY_ADVISORY_HELPER,
 			securityAdvisoriesHelper);

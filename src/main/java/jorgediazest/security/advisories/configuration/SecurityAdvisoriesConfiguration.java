@@ -44,6 +44,12 @@ public interface SecurityAdvisoriesConfiguration {
 	public boolean loginAdvisoriesEnabled();
 
 	@Meta.AD(
+		deflt = "Administrator", description = "roles-help", name = "roles",
+		required = false
+	)
+	public String[] roles();
+
+	@Meta.AD(
 		deflt = "4320", description = "refresh-data-interval-help",
 		name = "refresh-data-interval", required = false
 	)
