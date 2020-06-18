@@ -14,6 +14,7 @@
 
 package jorgediazest.security.advisories;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.Language;
@@ -43,14 +44,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jorge Díaz
  */
-@Component(immediate = true, service = SecurityAdvisoriesHelper.class)
+@Component(
+	configurationPid = "jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration",
+	immediate = true, service = SecurityAdvisoriesHelper.class
+)
 public class SecurityAdvisoriesHelper {
 
 	public List<Issue> getJiraIssues(String query, int buildNumber)
@@ -146,6 +153,12 @@ public class SecurityAdvisoriesHelper {
 		Map<String, Object> fields = (Map<String, Object>)issue.get("fields");
 
 		return _getFixpack(fields, buildNumber);
+	}
+
+	public SecurityAdvisoriesConfiguration
+		getSecurityAdvisoriesConfiguration() {
+
+		return _securityAdvisoriesConfiguration;
 	}
 
 	public List<Issue> getSev1Issues() {
@@ -263,7 +276,11 @@ public class SecurityAdvisoriesHelper {
 	}
 
 	@Activate
+	@Modified
 	protected void activate(Map<String, Object> properties) {
+		_securityAdvisoriesConfiguration = ConfigurableUtil.createConfigurable(
+			SecurityAdvisoriesConfiguration.class, properties);
+
 		reset();
 
 		initialize();
@@ -449,6 +466,10 @@ public class SecurityAdvisoriesHelper {
 	}
 
 	protected void initialize() {
+		if (!_securityAdvisoriesConfiguration.enabled()) {
+			return;
+		}
+
 		int buildNumber = ReleaseInfo.getBuildNumber();
 
 		if ((buildNumber % 100) < 10) {
@@ -482,17 +503,31 @@ public class SecurityAdvisoriesHelper {
 
 	protected void initialize(int buildNumber, int installedFixpackLevel) {
 		try {
+			String[] fixedIssues = PatcherUtil.getFixedIssues();
+
+			String issuesToIgnore =
+				_securityAdvisoriesConfiguration.issuesToIgnore();
+
+			if ((issuesToIgnore != null) && (issuesToIgnore.length() > 0)) {
+				String[] issuesToIgnoreArray = issuesToIgnore.split(",");
+
+				if (issuesToIgnoreArray.length > 0) {
+					fixedIssues = ArrayUtil.append(
+						fixedIssues, issuesToIgnoreArray);
+				}
+			}
+
 			latestJiraFixpack = getLatestJiraFixpack(
 				buildNumber, installedFixpackLevel);
 			sev1Issues = filterInstalledIssues(
-				getJiraSecurityIssues(buildNumber, 1),
-				PatcherUtil.getFixedIssues(), installedFixpackLevel);
+				getJiraSecurityIssues(buildNumber, 1), fixedIssues,
+				installedFixpackLevel);
 			sev2Issues = filterInstalledIssues(
-				getJiraSecurityIssues(buildNumber, 2),
-				PatcherUtil.getFixedIssues(), installedFixpackLevel);
+				getJiraSecurityIssues(buildNumber, 2), fixedIssues,
+				installedFixpackLevel);
 			sev3Issues = filterInstalledIssues(
-				getJiraSecurityIssues(buildNumber, 3),
-				PatcherUtil.getFixedIssues(), installedFixpackLevel);
+				getJiraSecurityIssues(buildNumber, 3), fixedIssues,
+				installedFixpackLevel);
 		}
 		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
@@ -646,5 +681,8 @@ public class SecurityAdvisoriesHelper {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SecurityAdvisoriesHelper.class);
+
+	private volatile SecurityAdvisoriesConfiguration
+		_securityAdvisoriesConfiguration;
 
 }

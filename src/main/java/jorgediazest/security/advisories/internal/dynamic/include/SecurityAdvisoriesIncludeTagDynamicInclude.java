@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jorgediazest.security.advisories.SecurityAdvisoriesHelper;
+import jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration;
 import jorgediazest.security.advisories.constants.SecurityAdvisoriesWebKeys;
 
 import org.osgi.service.component.annotations.Component;
@@ -46,6 +47,13 @@ public class SecurityAdvisoriesIncludeTagDynamicInclude
 			HttpServletResponse httpServletResponse, String tagClassName,
 			String tagDynamicId, String tagPoint)
 		throws IOException {
+
+		SecurityAdvisoriesConfiguration securityAdvisoriesConfiguration =
+			securityAdvisoriesHelper.getSecurityAdvisoriesConfiguration();
+
+		if (!securityAdvisoriesConfiguration.enabled()) {
+			return;
+		}
 
 		httpServletRequest.setAttribute(
 			SecurityAdvisoriesWebKeys.SECURITY_ADVISORY_HELPER,

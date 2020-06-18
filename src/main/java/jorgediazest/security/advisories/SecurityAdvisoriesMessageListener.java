@@ -28,36 +28,58 @@ import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import java.util.Date;
 import java.util.Map;
 
+import jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jorge Díaz
  */
-@Component(immediate = true, service = {})
+@Component(
+	configurationPid = "jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration",
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
+	service = {}
+)
 public class SecurityAdvisoriesMessageListener extends BaseMessageListener {
 
 	@Activate
+	@Modified
 	protected void activate(Map<String, Object> properties) {
+		deactivate();
+
+		SecurityAdvisoriesConfiguration securityAdvisoriesConfiguration =
+			securityAdvisoriesHelper.getSecurityAdvisoriesConfiguration();
+
 		Class<?> clazz = getClass();
 
 		String className = clazz.getName();
 
 		Trigger trigger = triggerFactory.createTrigger(
-			className, className, new Date(), null, INTERVAL, TimeUnit.DAY);
+			className, className, new Date(), null,
+			securityAdvisoriesConfiguration.refreshDataInterval(),
+			TimeUnit.MINUTE);
 
 		SchedulerEntry schedulerEntry = new SchedulerEntryImpl(
 			className, trigger);
 
 		schedulerEngineHelper.register(
 			this, schedulerEntry, DestinationNames.SCHEDULER_DISPATCH);
+
+		registeredScheduler = true;
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		schedulerEngineHelper.unregister(this);
+		if (registeredScheduler) {
+			schedulerEngineHelper.unregister(this);
+
+			registeredScheduler = false;
+		}
 	}
 
 	@Override
@@ -67,10 +89,10 @@ public class SecurityAdvisoriesMessageListener extends BaseMessageListener {
 		securityAdvisoriesHelper.writeLogTraces();
 	}
 
-	protected static final int INTERVAL = 3;
-
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
 	protected ModuleServiceLifecycle moduleServiceLifecycle;
+
+	protected boolean registeredScheduler = false;
 
 	@Reference
 	protected SchedulerEngineHelper schedulerEngineHelper;

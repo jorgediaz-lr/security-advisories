@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import jorgediazest.security.advisories.SecurityAdvisoriesHelper;
+import jorgediazest.security.advisories.configuration.SecurityAdvisoriesConfiguration;
 import jorgediazest.security.advisories.constants.SecurityAdvisoriesWebKeys;
 
 import org.osgi.service.component.annotations.Component;
@@ -48,6 +49,15 @@ public class SecurityAdvisoriesBottomJSPDynamicInclude
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
+
+		SecurityAdvisoriesConfiguration securityAdvisoriesConfiguration =
+			securityAdvisoriesHelper.getSecurityAdvisoriesConfiguration();
+
+		if (!securityAdvisoriesConfiguration.enabled() ||
+			!securityAdvisoriesConfiguration.loginAdvisoriesEnabled()) {
+
+			return;
+		}
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
